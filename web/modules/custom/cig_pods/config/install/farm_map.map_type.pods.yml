@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies:
+  enforced:
+    module:
+      - cig_pods
+id: pods
+label: PODS
+description: "A generic map type for PODS."
+behaviors: {}
+options: {}

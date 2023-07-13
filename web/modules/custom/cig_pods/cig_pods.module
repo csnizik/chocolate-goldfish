@@ -1,0 +1,122 @@
+<?php
+
+/**
+ * @file
+ * CIG PODS module.
+ */
+
+use Drupal\views\ViewExecutable;
+
+/**
+ * @file
+ * Module file for Producer Operation Data Systems (PODS)
+ */
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function cig_pods_entity_type_alter(array &$entity_types) {
+  /** @var \Drupal\Core\Entity\EntityTypeInterface[] $entity_types */
+
+  // Override the access handler for asset entities.
+  $entity_types['asset']->setAccessClass('Drupal\cig_pods\ProjectAccessControlHandler');
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function cig_pods_theme_registry_alter(&$theme_registry) {
+  $theme = \Drupal::theme()->getActiveTheme()->getName();
+  if ($theme == 'gin') {
+    $theme_registry['html']['path'] = \Drupal::service('extension.list.module')->getPath('cig_pods') . '/templates';
+  }
+}
+
+/**
+ * Implements hook_page_attachments().
+ */
+function cig_pods_page_attachments(array &$attachments) {
+  $attachments['#attached']['library'][] = 'cig_pods/hide_return';
+}
+
+/**
+ * Implements hook_views_pre_render().
+ */
+function cig_pods_views_pre_render(ViewExecutable $view) {
+
+  // Attach custom CSS libraries to PODS Asset List Views.
+  if ($view->id() == 'pods_asset_lists') {
+    $library = FALSE;
+    switch ($view->current_display) {
+
+      // Apply admin_details_display library.
+      case 'awardee':
+      case 'lab_testing_profile':
+      case 'producer':
+      case 'soil_health_management_unit':
+        $library = 'admin_details_display';
+        break;
+
+      // Apply admin_project_display library.
+      case 'pasture_assessment':
+      case 'project':
+        $library = 'admin_project_display';
+        break;
+
+      // Apply misc libraries...
+      case 'irrigation':
+        $library = 'irrigation_display';
+        break;
+
+      case 'field_assessment':
+        $library = 'field_assessment';
+        break;
+
+      case 'lab_result':
+        $library = 'awardee_lab_results_display';
+        break;
+
+      case 'lab_testing_method':
+        $library = 'awardee_methods_details_display';
+        break;
+
+      case 'operation':
+        $library = 'operation_display';
+        break;
+
+      case 'pasture_health_assessment':
+        $library = 'pasture_health_display';
+        break;
+
+      case 'range_assessment':
+        $library = 'range_assessment_display';
+        break;
+
+      case 'soil_health_sample':
+        $library = 'awardee_soil_sample_display';
+        break;
+    }
+    if ($library) {
+      $view->element['#attached']['library'][] = 'cig_pods/' . $library;
+    }
+  }
+}
+
+function cig_pods_cover_crop_terms(){
+  return [
+    'Alfalfa, Annual', 'Alfalfa, Perennial', 'Amaranth', 'Barley, Spring', 'Barley, Winter', 'Beans, Mung', 'Beans, Sword',
+    'Beans, Velvet', 'Bluegrass, Annual', 'Bluegrass, Perennial', 'Buckwheat', 'Cabbage, Ethiopian', 'Camelina', 'Canola or Rapeseed',
+    'Carrot', 'Chess, Soft', 'Chickpea', 'Chicory', 'Chufa', 'Clover, Alsike', 'Clover, Arrowleaf', 'Clover, Balansa', 'Clover, Berseem',
+    'Clover, Crimson', 'Clover, Egyptian', 'Clover, Kura', 'Clover, Micro', 'Clover, Red', 'Clover, Rose', 'Clover, Sour',
+    'Clover, Strawberry', 'Clover, Subterranean', 'Clover, White', 'Clover, White, Intermediate', 'Clover, White, Ladino',
+    'Collards', 'Corn', 'Cowpea', 'Crownvetch', 'Fescue', 'Flatpea', 'Flax', 'Guar', 'Indigo, Hairy', 'Kale', 'Lablab',
+    'Lentil', 'Lespedeza', 'Lemongrass', 'Lupin', 'Medic, Barrel', 'Medic, Black', 'Medic, Gamma', 'Millet, Foxtail',
+    'Millet, Japanese', 'Millet, Pearl', 'Millet, Proso', 'Mustard, Black', 'Mustard, Brown', 'Mustard, Field', 'Mustard, White',
+    'Mustard, Yellow', 'None', 'Oats, Field', 'Oats, Black', 'Oats, Forage', 'Orchardgrass', 'Other', 'Pea, Spring', 'Pea, Winter',
+    'Peanut, Perennial', 'Peanut, Pinto', 'Phacelia', 'Radish, Oilseed', 'Rye, Cereal', 'Ryegrass, Annual', 'Ryegrass, Perennial',
+    'Safflower', 'Sainfoin', 'Sesbania', 'Sesame', 'Sorghum', 'Sorghum x Sudangrass', 'Soybean', 'Soybean, Forage', 'Spelt',
+    'Spinach', 'Squash', 'Sudangrass', 'Sunflower', 'SunnHemp', 'Sweetclover, White', 'Sweetclover, Yellow', 'Teff',
+    'Trefoil, Birdsfoot', 'Triticale', 'Turnip', 'Vetch, Chickling', 'Vetch, Common', 'Vetch, Hairy', 'Vetch, Purple',
+    'Vetch, Woolypod', 'Vetiver', 'Weeds or Resident Vegetation', 'Wheat, Spring', 'Wheat, Winter',
+  ];
+}
